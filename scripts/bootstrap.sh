@@ -126,23 +126,23 @@ fi
 
 # Choose the vcpkg binary to download
 vcpkgDownloadTool="ON"
-vcpkgToolReleaseTag="2022-06-17"
+vcpkgToolReleaseTag="2022-09-20"
 if [ "$UNAME" = "Darwin" ]; then
     echo "Downloading vcpkg-macos..."
-    vcpkgToolReleaseSha="66ef24562d0a165d9462a3b3cc2e6ff728e26ab529aa4406dffb107492c1e91277fee4b187e776ae7a7730c5ff8cfb1063822852493b156e03151c730b509b2b"
+    vcpkgToolReleaseSha="d09cf1fb57d3a5a8965723e0de4fc29d05d3d48c06a2b21a027750c955d7f54a881265ae53805d0b0e674db6d4c0b303a915a070daacd72d87a111132daea5df"
     vcpkgToolName="vcpkg-macos"
 elif [ "$vcpkgUseMuslC" = "ON" ]; then
     echo "Downloading vcpkg-muslc..."
-    vcpkgToolReleaseSha="28533a64c0d876fdf78f7ed301847063b3ff0c2593cac6df3b0d38a5e09174cd8770caf985476523dab6f740b54c7400c8542e8df63fd094b5956a35d8579989"
+    vcpkgToolReleaseSha="f454db52986d6ac57117c61696d3d8f581db154d38a2aac1e7d2c234e3ed8486e017f2db4638e6d26fc5d6e545e76edc20d2a7e3a0fe12ca507bae86a250cca5"
     vcpkgToolName="vcpkg-muslc"
 elif [ "$ARCH" = "x86_64" ]; then
     echo "Downloading vcpkg-glibc..."
-    vcpkgToolReleaseSha="c85ec50df0de9648e1c5bdb690aa38d6c2ad2d9e5f92cd77648966f44f9b45418374925aacf5bbff0c608145f58dc9cd3391368e441e8254145c39ab1ae1fd33"
+    vcpkgToolReleaseSha="9f360cfd7189cc5c09f7445782075e524ba9e0e2f9205d5e7bfb0c531ade180678ee729e764955ca06056acb5d2b5892c92681e9fb8b7f77b8437924a2c9909d"
     vcpkgToolName="vcpkg-glibc"
 else
     echo "Unable to determine a binary release of vcpkg; attempting to build from source."
     vcpkgDownloadTool="OFF"
-    vcpkgToolReleaseSha="e52a359617c283932b4e4a33f4fa288fbe06edd676e4248b5543b83573a378dbf30c021395045e0726e69d4b5d41b012fd61af5eb4d586a1fb793c16bd64b77c"
+    vcpkgToolReleaseSha="0c7e90821889b3a5a1bec8542445c92226fa0201232dbde042ef1ba3bf6cb6f9eb0f0d99d509b064eb6023f97ab9491a11ab38cd39a4db6caa3183b7bcc4fe36"
 fi
 
 # Do the download or build.
