@@ -222,13 +222,17 @@ cmcstl2:x64-windows        = skip
 cmcstl2:x64-windows-static = skip
 cmcstl2:x64-windows-static-md=skip
 cmcstl2:x86-windows        = skip
-cnats:arm-neon-android=fail
-cnats:arm64-android=fail
-cnats:x64-android=fail
-coin-or-ipopt:x64-linux=fail
-concurrencpp:arm-neon-android=fail
-concurrencpp:arm64-android=fail
-concurrencpp:x64-android=fail
+coin:arm64-windows=fail
+coin:arm-uwp=fail
+coin:x64-uwp=fail
+
+# there is an ICE in VS2022 with colmap in release mode
+colmap:x86-windows=fail
+colmap:x64-windows=fail
+colmap:x64-windows-static=fail
+colmap:x64-windows-static-md=fail
+
+concurrencpp:x64-linux=fail
 concurrencpp:x64-osx=fail
 coroutine:arm-neon-android=fail
 coroutine:arm64-android=fail

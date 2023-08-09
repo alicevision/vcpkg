@@ -1660,32 +1660,8 @@
       "baseline": "4.0.0",
       "port-version": 7
     },
-    "coin-or-buildtools": {
-      "baseline": "2023-02-02",
-      "port-version": 0
-    },
-    "coin-or-cbc": {
-      "baseline": "2023-02-01",
-      "port-version": 0
-    },
-    "coin-or-cgl": {
-      "baseline": "2023-02-01",
-      "port-version": 0
-    },
-    "coin-or-clp": {
-      "baseline": "2023-02-01",
-      "port-version": 0
-    },
-    "coin-or-ipopt": {
-      "baseline": "2023-02-01",
-      "port-version": 0
-    },
-    "coin-or-osi": {
-      "baseline": "2023-02-01",
-      "port-version": 0
-    },
     "coinutils": {
-      "baseline": "2023-02-02",
+      "baseline": "2.11.4",
       "port-version": 1
     },
     "collada-dom": {
@@ -2926,7 +2902,11 @@
     },
     "glpk": {
       "baseline": "5.0",
+<<<<<<< HEAD
       "port-version": 2
+=======
+      "port-version": 0
+>>>>>>> parent of d84e61c2c (Fix coin-or ports.  (#29398))
     },
     "glslang": {
       "baseline": "12.2.0",
@@ -6062,7 +6042,11 @@
     },
     "openmvg": {
       "baseline": "2.0",
+<<<<<<< HEAD
       "port-version": 9
+=======
+      "port-version": 5
+>>>>>>> parent of d84e61c2c (Fix coin-or ports.  (#29398))
     },
     "openmvs": {
       "baseline": "2.1.0",
