@@ -104,23 +104,61 @@ index 6879c4c6..edf4e5b2 100644
  
  # ==============================================================================
  # CoinUtils
-@@ -356,13 +374,13 @@ endif()
+@@ -303,6 +322,7 @@ endif()
+ # - internal by default (CoinUtils),
+ # - external if COINUTILS_INCLUDE_DIR_HINTS and a valid CoinUtils setup is found
+ # ==============================================================================
++if(0)
+ if (NOT DEFINED COINUTILS_INCLUDE_DIR_HINTS)
+   set(COINUTILS_INCLUDE_DIR_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/osi_clp/CoinUtils/src/)
+   set(OpenMVG_USE_INTERNAL_COINUTILS ON)
+@@ -312,6 +332,9 @@ if (NOT DEFINED COINUTILS_INCLUDE_DIR_HINTS)
+ else()
+   find_package(CoinUtils QUIET)
+ endif()
++endif()
++ 
++find_package(CoinUtils REQUIRED)
+ 
+ ## ==============================================================================
+ ## Clp
+@@ -319,6 +342,7 @@ endif()
+ ## - internal by default (Clp),
+ ## - external if CLP_INCLUDE_DIR_HINTS and a valid Clp setup is found
+ ## ==============================================================================
++if(0)
  if (NOT DEFINED CLP_INCLUDE_DIR_HINTS)
    set(CLP_INCLUDE_DIR_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/osi_clp/Clp/src/)
    set(OpenMVG_USE_INTERNAL_CLP ON)
--  find_package(Clp QUIET)
-+  find_package(Clp REQUIRED)
-   set(CLP_INCLUDE_DIRS
-      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/osi_clp/Clp/src/
-      ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/osi_clp/Clp/src/OsiClp/)
-   set(CLP_LIBRARIES lib_clp lib_OsiClpSolver)
+@@ -330,13 +354,17 @@ if (NOT DEFINED CLP_INCLUDE_DIR_HINTS)
  else()
--  find_package(Clp QUIET)
-+  find_package(Clp REQUIRED)
+   find_package(Clp QUIET)
  endif()
++endif()
+ 
++find_package(Clp REQUIRED)
++ 
+ # ==============================================================================
+ # Osi
+ # ==============================================================================
+ # - internal by default (Osi),
+ # - external if OSI_INCLUDE_DIR_HINTS and a valid Osi setup is found
+ # ==============================================================================
++if(0)
+ if (NOT DEFINED OSI_INCLUDE_DIR_HINTS)
+   set(OSI_INCLUDE_DIR_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/osi_clp/Osi/src/)
+   set(OpenMVG_USE_INTERNAL_OSI ON)
+@@ -346,6 +374,9 @@ if (NOT DEFINED OSI_INCLUDE_DIR_HINTS)
+ else()
+   find_package(Osi QUIET)
+ endif()
++endif()
++
++find_package(Osi REQUIRED)
  
  # ==============================================================================
-@@ -398,6 +416,7 @@ endif()
+ # Internal CLP/OSI/COINUTILS libraries:
+@@ -364,6 +395,7 @@ endif()
  # - internal by default (Lemon),
  # - external if LEMON_INCLUDE_DIR_HINTS and a valid Lemon setup is found
  # ==============================================================================
@@ -264,59 +302,47 @@ index 6879c4c6..edf4e5b2 100644
  else()
    message(STATUS "LEMON: " ${LEMON_VERSION} " (external)")
 diff --git a/src/cmakeFindModules/FindClp.cmake b/src/cmakeFindModules/FindClp.cmake
-index 8a69c234..1ed9a21f 100644
+index 8a69c23..6ebc661 100644
 --- a/src/cmakeFindModules/FindClp.cmake
 +++ b/src/cmakeFindModules/FindClp.cmake
-@@ -51,7 +51,7 @@ IF(EXISTS "${CLP_DIR}" AND NOT "${CLP_DIR}" STREQUAL "")
+@@ -50,8 +50,8 @@ IF(EXISTS "${CLP_DIR}" AND NOT "${CLP_DIR}" STREQUAL "")
+         ENDIF (NOT EXISTS ${CLP_VERSION_FILE})
          SET(CLP_INCLUDE_DIR ${CLP_DIR})
  
-         FIND_LIBRARY(CLP_LIBRARY NAMES Clp)
+-        FIND_LIBRARY(CLP_LIBRARY NAMES Clp)
 -        FIND_LIBRARY(CLPSOLVER_LIBRARY NAMES ClpSolver)
 +        FIND_LIBRARY(CLPSOLVER_LIBRARY NAMES ClpSolver Clp)
++        FIND_LIBRARY(OSICLP_LIBRARY NAMES OsiClp Clp)
          FIND_LIBRARY(OSICLP_LIBRARY NAMES OsiClp)
  
          # locate Clp libraries
-diff --git a/src/cmakeFindModules/FindCoinUtils.cmake b/src/cmakeFindModules/FindCoinUtils.cmake
-index 5b64ce14..595fb7dc 100644
---- a/src/cmakeFindModules/FindCoinUtils.cmake
-+++ b/src/cmakeFindModules/FindCoinUtils.cmake
-@@ -57,6 +57,12 @@ IF(EXISTS "${COINUTILS_DIR}" AND NOT "${COINUTILS_DIR}" STREQUAL "")
-           SET(COINUTILS_LIBRARIES ${COINUTILS_LIBRARY})
-         ENDIF()
- 
-+        if(NOT WIN32)
-+            find_package(PkgConfig)
-+            pkg_check_modules(CoinUtils coinutils IMPORTED_TARGET)
-+            list(APPEND COINUTILS_LIBRARIES PkgConfig::CoinUtils)
-+        endif()
-+
-         MESSAGE(STATUS "CoinUtils ${COINUTILS_VERSION} found (include: ${COINUTILS_INCLUDE_DIRS})")
- ELSE()
-   MESSAGE(STATUS "You are attempting to build without CoinUtils. "
 diff --git a/src/cmakeFindModules/OpenMVGConfig.cmake.in b/src/cmakeFindModules/OpenMVGConfig.cmake.in
-index 5a788b56..ba3b4b3c 100644
+index e7dfbfd..65224c4 100644
 --- a/src/cmakeFindModules/OpenMVGConfig.cmake.in
 +++ b/src/cmakeFindModules/OpenMVGConfig.cmake.in
-@@ -51,6 +51,18 @@ set(OPENMVG_VERSION @OPENMVG_VERSION@)
- get_filename_component(CURRENT_CONFIG_INSTALL_DIR
-   "${CMAKE_CURRENT_LIST_FILE}" PATH)
+@@ -19,7 +19,7 @@
+ # OPENMVG_VERSION: Version of OpenMVG found.
+ #
  
+-# Called if we failed to find OpenMVG or any of it's required dependencies,
++# Called if we failed to find OpenMVG or any of its required dependencies,
+ # unsets all public (designed to be used externally) variables and reports
+ # error message at priority depending upon [REQUIRED/QUIET/<NONE>] argument.
+ macro(OPENMVG_REPORT_NOT_FOUND REASON_MSG)
+@@ -58,10 +58,20 @@ set(CALLERS_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+ # Reset CMake module path to the installation directory of this
+ # script.
+ set(CMAKE_MODULE_PATH ${CURRENT_CONFIG_INSTALL_DIR})
 +include(CMakeFindDependencyMacro)
 +
++find_dependency(CoinUtils)
++find_dependency(Clp)
++find_dependency(Osi)
 +find_dependency(flann)
 +find_dependency(Threads)
 +find_dependency(cereal)
 +find_dependency(Ceres)
 +find_dependency(vlfeat)
-+if(NOT WIN32)
-+    find_dependency(PkgConfig)
-+    pkg_check_modules(CoinUtils coinutils IMPORTED_TARGET)
-+endif()
-+
- # Record the state of the CMake module path when this script was
- # called so that we can ensure that we leave it in the same state on
- # exit as it was on entry, but modify it locally.
-@@ -61,7 +73,7 @@ set(CMAKE_MODULE_PATH ${CURRENT_CONFIG_INSTALL_DIR})
  
  # Build the absolute root install directory as a relative path
  get_filename_component(CURRENT_ROOT_INSTALL_DIR
@@ -325,6 +351,7 @@ index 5a788b56..ba3b4b3c 100644
  if (NOT EXISTS ${CURRENT_ROOT_INSTALL_DIR})
    OPENMVG_REPORT_NOT_FOUND(
      "OpenMVG install root: ${CURRENT_ROOT_INSTALL_DIR}, "
+<<<<<<< HEAD
 diff --git a/src/openMVG/linearProgramming/CMakeLists.txt b/src/openMVG/linearProgramming/CMakeLists.txt
 index 4532161d..e3ddedc6 100644
 --- a/src/openMVG/linearProgramming/CMakeLists.txt
@@ -342,6 +369,129 @@ index 4532161d..e3ddedc6 100644
  target_include_directories(openMVG_linearProgramming
 diff --git a/src/openMVG/matching/CMakeLists.txt b/src/openMVG/matching/CMakeLists.txt
 index b92a49b7..6fa26493 100644
+=======
+diff --git a/src/nonFree/sift/CMakeLists.txt b/src/nonFree/sift/CMakeLists.txt
+index 402a2d8..60ddc11 100644
+--- a/src/nonFree/sift/CMakeLists.txt
++++ b/src/nonFree/sift/CMakeLists.txt
+@@ -1,36 +1,36 @@
+ 
+-# libs should be static
+-set(BUILD_SHARED_LIBS OFF)
+-
+-# use PIC code for link into shared lib
+-if(UNIX)
+-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+-endif(UNIX)
+-
+-if(NOT USE_SSE2)
+-  add_definitions(-DVL_DISABLE_SSE2)
+-endif()
+-
+-add_definitions(-DVL_DISABLE_THREADS)
+-
+-include_directories(./vl)
+-set(FEATS
+-  vl/generic.c
+-  vl/imopv_sse2.c
+-  vl/sift.c
+-  vl/imopv.c
+-  vl/mathop_sse2.c
+-  vl/sift.c
+-  vl/host.c
+-  vl/mathop.c
+-  vl/random.c)
+-set_source_files_properties(${FEATS} PROPERTIES LANGUAGE C)
+-add_library(vlsift ${FEATS})
+-install(TARGETS vlsift DESTINATION lib EXPORT openMVG-targets)
+-set_property(TARGET vlsift PROPERTY FOLDER OpenMVG/nonFree)
++## libs should be static
++#set(BUILD_SHARED_LIBS OFF)
++#
++## use PIC code for link into shared lib
++#if(UNIX)
++#  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
++#endif(UNIX)
++#
++#if(NOT USE_SSE2)
++#  add_definitions(-DVL_DISABLE_SSE2)
++#endif()
++#
++#add_definitions(-DVL_DISABLE_THREADS)
++#
++#include_directories(./vl)
++#set(FEATS
++#  vl/generic.c
++#  vl/imopv_sse2.c
++#  vl/sift.c
++#  vl/imopv.c
++#  vl/mathop_sse2.c
++#  vl/sift.c
++#  vl/host.c
++#  vl/mathop.c
++#  vl/random.c)
++#set_source_files_properties(${FEATS} PROPERTIES LANGUAGE C)
++#add_library(vlsift ${FEATS})
++#install(TARGETS vlsift DESTINATION lib EXPORT openMVG-targets)
++#set_property(TARGET vlsift PROPERTY FOLDER OpenMVG/nonFree)
+ install(
+   DIRECTORY .
+   DESTINATION include/openMVG_dependencies/nonFree/sift
+   COMPONENT headers
+-  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
++  FILES_MATCHING PATTERN "*.hpp"
+ )
+diff --git a/src/nonFree/sift/SIFT_describer.hpp b/src/nonFree/sift/SIFT_describer.hpp
+index cd800b0..20e9c8e 100644
+--- a/src/nonFree/sift/SIFT_describer.hpp
++++ b/src/nonFree/sift/SIFT_describer.hpp
+@@ -17,9 +17,7 @@
+ #include <iostream>
+ #include <numeric>
+ 
+-extern "C" {
+-#include "nonFree/sift/vl/sift.h"
+-}
++#include <sift.h>
+ 
+ namespace openMVG {
+ namespace features {
+@@ -174,7 +172,7 @@ public:
+       const int nkeys = vl_sift_get_nkeypoints(filt);
+ 
+       // Update gradient before launching parallel extraction
+-      vl_sift_update_gradient(filt);
++      update_gradient(filt);
+ 
+       #ifdef OPENMVG_USE_OPENMP
+       #pragma omp parallel for private(descr, descriptor)
+diff --git a/src/openMVG/linearProgramming/CMakeLists.txt b/src/openMVG/linearProgramming/CMakeLists.txt
+index cc5212f..acc57dd 100644
+--- a/src/openMVG/linearProgramming/CMakeLists.txt
++++ b/src/openMVG/linearProgramming/CMakeLists.txt
+@@ -15,16 +15,12 @@ target_link_libraries(openMVG_linearProgramming
+   PUBLIC
+     openMVG_numeric
+   PRIVATE
+-    ${CLP_LIBRARIES}     # clp + solver wrapper
+-    ${COINUTILS_LIBRARY} # container tools
+-    ${OSI_LIBRARY}       # generic LP
++    Coin::Clp       # clp + solver wrapper
++    Coin::CoinUtils # container tools
++    Coin::Osi       # generic LP
+ )
+ 
+ target_include_directories(openMVG_linearProgramming
+-  PRIVATE
+-    ${CLP_INCLUDE_DIRS}
+-    ${COINUTILS_INCLUDE_DIRS}
+-    ${OSI_INCLUDE_DIRS}
+   PUBLIC
+     $<INSTALL_INTERFACE:include>
+ )
+diff --git a/src/openMVG/matching/CMakeLists.txt b/src/openMVG/matching/CMakeLists.txt
+index 2e0eafd7..d54d1e88 100644
+>>>>>>> parent of d84e61c2c3 (Fix coin-or ports.  (#29398))
 --- a/src/openMVG/matching/CMakeLists.txt
 +++ b/src/openMVG/matching/CMakeLists.txt
 @@ -16,6 +16,7 @@ list(REMOVE_ITEM matching_files_cpp ${REMOVEFILESUNITTEST})
@@ -352,9 +502,12 @@ index b92a49b7..6fa26493 100644
  
  set_source_files_properties(${matching_files_cpp} PROPERTIES LANGUAGE CXX)
  add_library(openMVG_matching
-@@ -37,10 +38,10 @@ target_link_libraries(openMVG_matching
+@@ -35,12 +36,12 @@ target_link_libraries(openMVG_matching
+   PUBLIC
+     openMVG_features
      Threads::Threads
-     ${cereal_TARGET}
+-    cereal
++    cereal::cereal
  )
 -if (NOT DEFINED OpenMVG_USE_INTERNAL_FLANN)
 +if (NOT OpenMVG_USE_INTERNAL_FLANN)
@@ -365,8 +518,109 @@ index b92a49b7..6fa26493 100644
  )
  endif()
  set_target_properties(openMVG_matching PROPERTIES SOVERSION ${OPENMVG_VERSION_MAJOR} VERSION "${OPENMVG_VERSION_MAJOR}.${OPENMVG_VERSION_MINOR}")
+diff --git a/src/openMVG/numeric/CMakeLists.txt b/src/openMVG/numeric/CMakeLists.txt
+index 1f3fc30..4097320 100644
+--- a/src/openMVG/numeric/CMakeLists.txt
++++ b/src/openMVG/numeric/CMakeLists.txt
+@@ -26,7 +26,7 @@ target_include_directories(openMVG_numeric
+     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+     $<INSTALL_INTERFACE:include>
+ )
+-if (DEFINED OpenMVG_USE_INTERNAL_EIGEN)
++if (OpenMVG_USE_INTERNAL_EIGEN)
+   target_include_directories(openMVG_numeric PUBLIC
+     $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include/openMVG/third_party/eigen/>)
+ else()
+diff --git a/src/openMVG_Samples/describe_and_match_GUI/CMakeLists.txt b/src/openMVG_Samples/describe_and_match_GUI/CMakeLists.txt
+index 862ffc7..62508af 100644
+--- a/src/openMVG_Samples/describe_and_match_GUI/CMakeLists.txt
++++ b/src/openMVG_Samples/describe_and_match_GUI/CMakeLists.txt
+@@ -18,8 +18,7 @@ if (OpenMVG_BUILD_GUI_SOFTWARES)
+       add_executable( openMVG_sample_describe_and_match_GUI WIN32 ${FEATURES_PAIR_DEMO_SRCS} ${FEATURES_PAIR_DEMO_HDRS} )
+     endif( APPLE )
+ 
+-    target_link_libraries( openMVG_sample_describe_and_match_GUI Qt5::Widgets openMVG_features openMVG_image openMVG_matching vlsift )
+-
++    target_link_libraries( openMVG_sample_describe_and_match_GUI Qt5::Widgets openMVG_features openMVG_image openMVG_matching unofficial::vlfeat::vl )
+     set_target_properties( openMVG_sample_describe_and_match_GUI PROPERTIES CXX_STANDARD 11)
+ 
+     set_property(TARGET openMVG_sample_describe_and_match_GUI PROPERTY FOLDER OpenMVG/Samples)
+diff --git a/src/openMVG_Samples/features_image_matching/CMakeLists.txt b/src/openMVG_Samples/features_image_matching/CMakeLists.txt
+index 18fb385..d44ffce 100644
+--- a/src/openMVG_Samples/features_image_matching/CMakeLists.txt
++++ b/src/openMVG_Samples/features_image_matching/CMakeLists.txt
+@@ -5,7 +5,7 @@ target_link_libraries(openMVG_sample_image_matching
+   openMVG_features
+   openMVG_matching
+   ${STLPLUS_LIBRARY}
+-  vlsift)
++  unofficial::vlfeat::vl)
+ target_compile_definitions(openMVG_sample_image_matching
+   PRIVATE -DTHIS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+ 
+diff --git a/src/openMVG_Samples/features_repeatability/CMakeLists.txt b/src/openMVG_Samples/features_repeatability/CMakeLists.txt
+index fd2b7c6..91f2766 100644
+--- a/src/openMVG_Samples/features_repeatability/CMakeLists.txt
++++ b/src/openMVG_Samples/features_repeatability/CMakeLists.txt
+@@ -6,7 +6,7 @@ target_link_libraries(openMVG_sample_main_features_repeatability_dataset
+   openMVG_matching
+   openMVG_system
+   openMVG_multiview
+-  vlsift
++  unofficial::vlfeat::vl
+   ${STLPLUS_LIBRARY})
+ 
+ set_property(TARGET openMVG_sample_main_features_repeatability_dataset PROPERTY FOLDER OpenMVG/Samples)
+diff --git a/src/software/Localization/CMakeLists.txt b/src/software/Localization/CMakeLists.txt
+index 2f60393..0d57d0a 100644
+--- a/src/software/Localization/CMakeLists.txt
++++ b/src/software/Localization/CMakeLists.txt
+@@ -11,7 +11,7 @@ target_link_libraries(openMVG_main_SfM_Localization
+   openMVG_sfm
+   openMVG_exif
+   ${STLPLUS_LIBRARY}
+-  vlsift
++  unofficial::vlfeat::vl
+   )
+ 
+ # Installation rules
+diff --git a/src/software/SfM/CMakeLists.txt b/src/software/SfM/CMakeLists.txt
+index 6db7e83..51e06f5 100644
+--- a/src/software/SfM/CMakeLists.txt
++++ b/src/software/SfM/CMakeLists.txt
+@@ -44,7 +44,7 @@ target_link_libraries(openMVG_main_ComputeFeatures
+     openMVG_multiview
+     openMVG_sfm
+     ${STLPLUS_LIBRARY}
+-    vlsift
++    unofficial::vlfeat::vl
+ )
+ if (MSVC)
+   set_target_properties(openMVG_main_ComputeFeatures PROPERTIES COMPILE_FLAGS "/bigobj")
+@@ -275,7 +275,7 @@ if(OpenMVG_USE_OPENCV)
+     openMVG_multiview
+     openMVG_sfm
+     ${STLPLUS_LIBRARY}
+-    vlsift
++    unofficial::vlfeat::vl
+     ${OpenCV_LIBS})
+   target_include_directories(openMVG_main_ComputeFeatures_OpenCV PRIVATE ${OpenCV_INCLUDE_DIRS})
+ 
+diff --git a/src/software/VO/Tracker_opencv_klt.hpp b/src/software/VO/Tracker_opencv_klt.hpp
+index aa7dffe..2c4d237 100644
+--- a/src/software/VO/Tracker_opencv_klt.hpp
++++ b/src/software/VO/Tracker_opencv_klt.hpp
+@@ -80,7 +80,7 @@ struct Tracker_opencv_KLT : public Abstract_Tracker
+     std::vector<cv::KeyPoint> m_nextKeypoints;
+ 
+     cv::Ptr<cv::FeatureDetector> m_detector = cv::GFTTDetector::create(count);
+-    if (m_detector == NULL)
++    if (m_detector == nullptr)
+       return false;
+ 
+     m_detector->detect(current_img, m_nextKeypoints);
 diff --git a/src/third_party/CMakeLists.txt b/src/third_party/CMakeLists.txt
-index 1e025dc6..4a06dfcc 100644
+index 0d61c9f..05c8b29 100644
 --- a/src/third_party/CMakeLists.txt
 +++ b/src/third_party/CMakeLists.txt
 @@ -18,7 +18,7 @@ add_subdirectory(stlplus3)
@@ -374,32 +628,85 @@ index 1e025dc6..4a06dfcc 100644
  
  # Add graph library
 -if(DEFINED OpenMVG_USE_INTERNAL_LEMON)
-+if(0)
++if(OpenMVG_USE_INTERNAL_LEMON)
    add_subdirectory(lemon)
    set(LEMON_LIBRARY openMVG_lemon PARENT_SCOPE)
  endif()
-@@ -64,13 +64,13 @@ endif (NOT TIFF_FOUND)
- ##
+@@ -67,7 +67,7 @@ endif (NOT TIFF_FOUND)
+ add_subdirectory(vectorGraphics)
  
  # Add ceres-solver (A Nonlinear Least Squares Minimizer)
 -if (DEFINED OpenMVG_USE_INTERNAL_CERES)
-+if (0)
++if (OpenMVG_USE_INTERNAL_CERES)
+   add_subdirectory(cxsparse)
    add_subdirectory(ceres-solver)
-   set_property(TARGET openMVG_ceres PROPERTY FOLDER OpenMVG/3rdParty/ceres)
+   set_property(TARGET openMVG_cxsparse PROPERTY FOLDER OpenMVG/3rdParty/ceres)
+@@ -75,7 +75,7 @@ if (DEFINED OpenMVG_USE_INTERNAL_CERES)
  endif()
  
  # Add an Approximate Nearest Neighbor library
 -if (DEFINED OpenMVG_USE_INTERNAL_FLANN)
-+if (0)
++if (OpenMVG_USE_INTERNAL_FLANN)
    set(FLANN_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/openMVG/third_party/flann/src/cpp)
    add_subdirectory(flann)
  endif()
-@@ -84,7 +84,7 @@ add_subdirectory(fast)
+@@ -89,7 +89,7 @@ add_subdirectory(fast)
  ##
  # Install Header only libraries if necessary
  ##
 -if (DEFINED OpenMVG_USE_INTERNAL_EIGEN)
-+if (0)
++if (OpenMVG_USE_INTERNAL_EIGEN)
    #Configure Eigen install
    set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/openMVG/third_party/eigen)
    add_subdirectory(eigen)
+diff --git a/src/openMVG/cameras/CMakeLists.txt b/src/openMVG/cameras/CMakeLists.txt
+index 333ab729..50c8f572 100644
+--- a/src/openMVG/cameras/CMakeLists.txt
++++ b/src/openMVG/cameras/CMakeLists.txt
+@@ -4,7 +4,7 @@ set_property(TARGET openMVG_camera APPEND PROPERTY
+   INTERFACE_INCLUDE_DIRECTORIES "$<INSTALL_INTERFACE:include>")
+ 
+ target_compile_features(openMVG_camera INTERFACE ${CXX11_FEATURES})
+-target_link_libraries(openMVG_camera INTERFACE openMVG_numeric cereal ${OPENMVG_LIBRARY_DEPENDENCIES})
++target_link_libraries(openMVG_camera INTERFACE openMVG_numeric cereal::cereal ${OPENMVG_LIBRARY_DEPENDENCIES})
+ install(TARGETS openMVG_camera DESTINATION lib EXPORT openMVG-targets)
+ 
+ UNIT_TEST(openMVG Camera_Pinhole openMVG_camera)
+diff --git a/src/openMVG/features/CMakeLists.txt b/src/openMVG/features/CMakeLists.txt
+index 2e49701d..0b5e1c3d 100644
+--- a/src/openMVG/features/CMakeLists.txt
++++ b/src/openMVG/features/CMakeLists.txt
+@@ -31,7 +31,7 @@ target_include_directories(openMVG_features
+ )
+ target_link_libraries(openMVG_features
+   PRIVATE openMVG_fast ${STLPLUS_LIBRARY}
+-  PUBLIC ${OPENMVG_LIBRARY_DEPENDENCIES} cereal)
++  PUBLIC ${OPENMVG_LIBRARY_DEPENDENCIES} cereal::cereal)
+ if (MSVC)
+   set_target_properties(openMVG_features PROPERTIES COMPILE_FLAGS "/bigobj")
+   target_compile_options(openMVG_features PUBLIC "-D_USE_MATH_DEFINES")
+diff --git a/src/openMVG/geometry/CMakeLists.txt b/src/openMVG/geometry/CMakeLists.txt
+index 0a6a016a..e509a4d5 100644
+--- a/src/openMVG/geometry/CMakeLists.txt
++++ b/src/openMVG/geometry/CMakeLists.txt
+@@ -21,7 +21,7 @@ set_property(TARGET openMVG_geometry PROPERTY FOLDER OpenMVG/OpenMVG)
+ target_link_libraries(openMVG_geometry
+   PUBLIC
+     openMVG_numeric
+-    cereal
++    cereal::cereal
+   PRIVATE
+     openMVG_linearProgramming
+ )
+diff --git a/src/openMVG/sfm/CMakeLists.txt b/src/openMVG/sfm/CMakeLists.txt
+index b8928083..1d10f939 100644
+--- a/src/openMVG/sfm/CMakeLists.txt
++++ b/src/openMVG/sfm/CMakeLists.txt
+@@ -25,7 +25,7 @@ target_link_libraries(openMVG_sfm
+     openMVG_graph
+     openMVG_matching
+     openMVG_multiview
+-    cereal
++    cereal::cereal
+     ${OPENMVG_LIBRARY_DEPENDENCIES}
+ )
