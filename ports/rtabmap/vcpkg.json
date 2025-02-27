@@ -1,7 +1,7 @@
 {
   "name": "rtabmap",
   "version": "0.21.4.1",
-  "port-version": 5,
+  "port-version": 4,
   "description": "Real-Time Appearance-Based Mapping",
   "homepage": "https://introlab.github.io/rtabmap/",
   "license": null,
@@ -10,12 +10,7 @@
     "g2o",
     {
       "name": "opencv",
-      "default-features": false,
-      "features": [
-        "fs",
-        "intrinsics",
-        "thread"
-      ]
+      "default-features": false
     },
     {
       "name": "pcl",
@@ -40,10 +35,7 @@
     "gui",
     "opencv-contrib",
     "opencv-nonfree",
-    {
-      "name": "openmp",
-      "platform": "!osx"
-    }
+    "tools"
   ],
   "features": {
     "gui": {
@@ -91,10 +83,7 @@
           "name": "opencv",
           "default-features": false,
           "features": [
-            "contrib",
-            "fs",
-            "intrinsics",
-            "thread"
+            "contrib"
           ]
         }
       ]
@@ -106,10 +95,7 @@
           "name": "opencv",
           "default-features": false,
           "features": [
-            "cuda",
-            "fs",
-            "intrinsics",
-            "thread"
+            "cuda"
           ]
         }
       ]
@@ -121,16 +107,10 @@
           "name": "opencv",
           "default-features": false,
           "features": [
-            "fs",
-            "intrinsics",
-            "nonfree",
-            "thread"
+            "nonfree"
           ]
         }
       ]
-    },
-    "openmp": {
-      "description": "Enable OpenMP parallel execution"
     },
     "openni2": {
       "description": "Build RTAB-Map with OpenNI2 camera driver",
