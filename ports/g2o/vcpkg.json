@@ -1,15 +1,14 @@
 {
   "name": "g2o",
   "version-date": "2024-12-14",
-  "port-version": 3,
+  "port-version": 2,
   "description": "g2o: A General Framework for Graph Optimization",
   "homepage": "https://openslam.org/g2o.html",
   "dependencies": [
     "ceres",
     "eigen3",
     "lapack",
-    "suitesparse-cholmod",
-    "suitesparse-cxsparse",
+    "suitesparse",
     {
       "name": "vcpkg-cmake",
       "host": true
